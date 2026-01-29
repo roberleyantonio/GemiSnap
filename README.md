@@ -1,11 +1,11 @@
 # GemiSnap 📸
 
-![Kotlin](https://img.shields.io/badge/Kotlin-1.9+-blue.svg)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.3+-blue.svg)
 ![Android](https://img.shields.io/badge/Platform-Android-green.svg)
 ![Koin](https://img.shields.io/badge/DI-Koin-orange.svg)
 ![Gemini](https://img.shields.io/badge/AI-Gemini_Pro-purple.svg)
 
-**GemiSnap** is a high-performance Android application designed to analyze images using the **Google Gemini AI SDK**. The project is built with a focus on **Clean Architecture**, memory efficiency, and full internationalization.
+**GemiSnap** is a high-performance Android application designed to analyze images using the **Google Gemini AI SDK**. The project is built with a focus on **Clean Architecture**, on the last Android 15+ stack (SDK 36), memory efficiency, and full internationalization.
 
 ---
 
@@ -13,8 +13,9 @@
 
 - **Gemini AI Integration**: Advanced image-to-text analysis using Generative AI.
 - **Efficient Image Handling**: Custom `AndroidBitmapDecoder` with automatic downsampling to prevent `OutOfMemory` (OOM) errors.
-- **Clean Architecture**: Decoupled layers using `HubSnapContract.UiModel` for highly testable UI logic.
+- **Clean Architecture**: Decoupled layers using `UiModel` for highly testable UI logic.
 - **Memory Optimized**: Strict bitmap lifecycle management with explicit recycling after Base64 conversion.
+- **Modern UI**: Built entirely with Jetpack Compose using the new kotlin-compose plugin (v2.3.0).
 
 ## 🏗 Architecture & Design
 
@@ -23,6 +24,13 @@ The project is structured to ensure that business logic is completely separated 
 - **Presentation**: `HubSnapUiModelImpl` handles UI states, formatting, and localized messages.
 - **Infrastructure**: `AndroidBitmapDecoder` manages low-level image decoding using modern `ImageDecoder` APIs.
 - **Dependency Injection**: Powered by **Koin** for clean and scalable module management.
+
+## 🏗 Tech Stack (Modern Specs)
+- Language: Kotlin 2.3.0
+- UI: Compose BOM 2026.01.00
+- DI: Koin 4.1.1
+- Network: Retrofit 3.0.0 + OkHttp 5.3.2
+- Test: MockK 1.14.7 + Turbine 1.2.1
 
 ## 🚀 Getting Started
 
@@ -36,7 +44,8 @@ The project is structured to ensure that business logic is completely separated 
 ## 🧪 Testing
 
 The codebase is designed for high testability:
-- **Unit Tests**: Using **MockK** to validate `HubSnapUiModelImpl` logic without Android dependencies.
+- **Unit Tests**: Using **MockK** to validate logic without Android dependencies.
+- **Flow**: **Turbine** for testing Coroutine Flows.
 
 `./gradlew test`
 
