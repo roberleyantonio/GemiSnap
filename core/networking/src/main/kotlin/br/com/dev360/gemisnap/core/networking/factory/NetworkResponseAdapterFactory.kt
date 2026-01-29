@@ -1,10 +1,9 @@
 package br.com.dev360.gemisnap.core.networking.factory
 
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 import retrofit2.CallAdapter
 import retrofit2.Retrofit
-import kotlin.jvm.java
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 class NetworkResponseAdapterFactory : CallAdapter.Factory() {
     override fun get(
@@ -12,7 +11,7 @@ class NetworkResponseAdapterFactory : CallAdapter.Factory() {
         annotations: Array<out Annotation>,
         retrofit: Retrofit
     ): CallAdapter<*, *>? {
-        return try {
+        return runCatching {
             check(returnType is ParameterizedType) {
                 "return type"
             }
@@ -29,8 +28,6 @@ class NetworkResponseAdapterFactory : CallAdapter.Factory() {
 
             return NetworkResponseAdapter(successBodyType)
 
-        } catch (ex: ClassCastException) {
-            null
-        }
+        }.getOrNull()
     }
 }
