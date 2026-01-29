@@ -10,8 +10,6 @@ sealed class Failure(
     open val url: String? = String.empty()
 ) : java.lang.Exception() {
 
-    data class NoDataAvailable(override val codeStatusBackEnd: String? = null) :
-        Failure(codeStatusBackEnd, "No data available")
 
     data class NoDataContent(
         override val codeStatusBackEnd: String? = null,
@@ -32,38 +30,23 @@ sealed class Failure(
         override val codeStatusBackEnd: String? = String.empty(),
         private val msg: String? = null
     ) : Failure(
-        codeStatusBackEnd, msg ?: DEFAULT_MSG
+        codeStatusBackEnd, msg.orEmpty()
     )
 
-    data class LoadingState(
-        override val codeStatusBackEnd: String? = String.empty(),
-        private val msg: String? = null
-    ) : Failure(
-        codeStatusBackEnd, msg ?: DEFAULT_MSG
-    )
 
     data class UnknownError(
         override val codeStatusBackEnd: String? = null,
         private val throwable: Throwable? = Exception(),
         override val url: String? = String.empty()
     ) : Failure(
-        codeStatusBackEnd, throwable?.message ?: DEFAULT_MSG
-    )
-
-    data class LocalError(
-        override val codeStatusBackEnd: String? = null,
-        private val throwable: Throwable? = Exception(),
-        override val url: String? = String.empty()
-    ) : Failure(
-        codeStatusBackEnd, throwable?.message ?: DEFAULT_MSG
+        codeStatusBackEnd, throwable?.message.orEmpty()
     )
 
     data class NetworkError(
-        override val codeStatusBackEnd: String? = "-1200",
+        override val codeStatusBackEnd: String? = "-999",
         private val throwable: Throwable
     ) : Failure(
-        codeStatusBackEnd,
-        "Sem conexão."
+        codeStatusBackEnd
     )
 
     open class ServerError(
@@ -101,8 +84,4 @@ sealed class Failure(
         }
     }
 
-
-    companion object {
-        private const val DEFAULT_MSG = "Não foi possível concluir."
-    }
 }

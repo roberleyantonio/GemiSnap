@@ -5,10 +5,10 @@ import br.com.dev360.gemisnap.feature.snap.BASE64_IMAGE
 import br.com.dev360.gemisnap.feature.snap.BuildConfig
 import br.com.dev360.gemisnap.feature.snap.ERROR_MESSAGE
 import br.com.dev360.gemisnap.feature.snap.EXPECTED_API_KEY
-import br.com.dev360.gemisnap.feature.snap.GEMINI_RESPONSE_TEXT
 import br.com.dev360.gemisnap.feature.snap.IMAGE_TYPE
 import br.com.dev360.gemisnap.feature.snap.PROMPT
-import br.com.dev360.gemisnap.feature.snap.geminiResponse
+import br.com.dev360.gemisnap.feature.snap.geminiNetworkResponseSuccess
+import br.com.dev360.gemisnap.feature.snap.geminiResultWrapperSuccess
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.GeminiRequest
 import br.com.dev360.gemisnap.feature.snap.hub.domain.HubSnapContract
 import io.mockk.clearAllMocks
@@ -48,11 +48,11 @@ class HubSnapRepositoryImplTest {
                 apiKey = BuildConfig.GEMINI_API_KEY,
                 request = capture(requestSlot)
             )
-        } returns geminiResponse
+        } returns geminiNetworkResponseSuccess
 
         val result = repository.generateContent(PROMPT, BASE64_IMAGE)
 
-        assertEquals(GEMINI_RESPONSE_TEXT, result)
+        assertEquals(geminiResultWrapperSuccess, result)
 
         val capturedRequest = requestSlot.captured
         val content = capturedRequest.contents.firstOrNull()
@@ -85,24 +85,6 @@ class HubSnapRepositoryImplTest {
                     request = any()
                 )
             }
-        }
-    }
-
-    @Test
-    fun `generateContent should call remoteDataSource and return the flow`() = runTest {
-        coEvery {
-            remoteDataSource.generateContent(apiKey = any(), request = any())
-        } returns geminiResponse
-
-        val result = repository.generateContent(PROMPT, BASE64_IMAGE)
-
-        assertEquals(GEMINI_RESPONSE_TEXT, result)
-
-        coVerifyOnce {
-            remoteDataSource.generateContent(
-                apiKey = EXPECTED_API_KEY,
-                request = any()
-            )
         }
     }
 }

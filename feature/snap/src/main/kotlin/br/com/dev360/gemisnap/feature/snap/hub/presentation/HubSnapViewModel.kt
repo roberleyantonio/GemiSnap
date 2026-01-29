@@ -24,7 +24,7 @@ data class HubSnapState(
     val prompt: String = String.empty(),
     val geminiText: String? = null,
     val isLoading: Boolean = false,
-    val isError: Boolean = false,
+    val errorMessage: String? = null
 )
 
 class HubSnapViewModel(
@@ -70,28 +70,40 @@ class HubSnapViewModel(
         analysisJob?.cancel()
 
         analysisJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, isError = false) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val imageResult = runCatching {
-                withContext(dispatchers.io()) {
-                    uiModel.decodeAndConvertBase64(uri)
-                }
-            }.mapCatching { base64Image ->
-                repository.generateContent(prompt, base64Image)
+            val base64Image = withContext(dispatchers.io()) {
+                runCatching { uiModel.decodeAndConvertBase64(uri) }.getOrNull()
             }
 
-            imageResult.onSuccess { geminiText ->
+            if (base64Image == null) {
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = uiModel.getDecodeImageErrorMessage())
+                }
+                return@launch
+            }
+
+            repository.generateContent(prompt, base64Image).withSuccessAndError({ geminiText ->
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         geminiText = geminiText,
-                        isError = false
+                        errorMessage = null
                     )
                 }
-            }.onFailure {
-                _uiState.update { it.copy(isLoading = false, isError = true) }
-            }
+            }, { failure ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = uiModel.getErrorMessage(failure)
+                    )
+                }
+            })
         }
+    }
+
+    fun closeFeedbackError() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 
     private fun clearResult() {
@@ -99,7 +111,7 @@ class HubSnapViewModel(
             it.copy(
                 geminiText = null,
                 isLoading = false,
-                isError = false
+                errorMessage = null
             )
         }
     }

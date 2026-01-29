@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hub_snap_screen_title">GemiSnap</string>
+    <string name="select_image_text">Toque para selecionar uma imagem</string>
+    <string name="prompt_label">O que a IA deve fazer?</string>
+    <string name="prompt_placeholder_text">Ex: Extraia os contatos deste cartão…</string>
+    <string name="image_content_description">Preview</string>
+    <string name="default_prompt">"Descreva esta imagem em detalhes"</string>
+    <string name="start_again">Começar de novo</string>
+    <string name="get_from_gemini">Analisar com Gemini 2.5</string>
+    <string name="text_clip_data_label">Texto</string>
+    <string name="text_copied">Texto copiado</string>
+    <string name="gemini_error_title">Erro</string>
+    <string name="gemini_primary_button_title">Tentar novamente</string>
+    <string name="gemini_secondary_button_title">Cancelar</string>
+    <string name="error_no_internet">Parece que você está offline. Verifique sua conexão.</string>
+    <string name="error_server_down">O servidor do Gemini está instável no momento. Tente novamente em breve.</string>
+    <string name="error_api_key">Erro de autenticação. Verifique sua chave da API.</string>
+    <string name="error_generic">Ocorreu um erro inesperado: %1$s</string>
+    <string name="error_decode_image">Não conseguimos processar esta imagem. Tente outra.</string>
+</resources>

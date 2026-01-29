@@ -7,13 +7,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.dev360.gemisnap.core.sharedui.theme.GemiSnapTheme
@@ -27,12 +29,21 @@ fun ScreenFeedback(
     onPrimaryButtonClick: () -> Unit,
     onSecondaryButtonClick: (() -> Unit)? = null,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     if (feedbackData == null) return
     val feedbackIcon = FeedbackDefaults.feedbackIcon(feedbackData.feedbackType)
 
+    LaunchedEffect(Unit) {
+        keyboardController?.hide()
+        focusManager.clearFocus()
+    }
+
     Column(
         modifier = modifier
-            .padding(horizontal = dimens.margin_16),
+            .padding(horizontal = dimens.margin_16)
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(

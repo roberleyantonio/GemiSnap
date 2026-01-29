@@ -9,13 +9,8 @@ data class FailureResponse(
     @SerializedName("message")
     val details: String? = null,
 
-    @SerializedName("codigo")
-    val codigo: String? = null,
-
-    @SerializedName("detalhe")
-    val detalhe: String? = null
 ) {
-    fun getCodeResponse(): String? = code ?: codigo
+    fun getCodeResponse(): String? = code
 
-    fun getMessageResponse(): String? = details ?: detalhe
+    fun getMessageResponse(): String? = details
 }

@@ -11,7 +11,6 @@ sealed class NetworkResponse<out T> {
         val value: T
     ) : NetworkResponse<T>()
 
-    @Deprecated("Use handleError() instead")
     data class Error(
         @Transient
         val exception: Failure? = null

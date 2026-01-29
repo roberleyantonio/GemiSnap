@@ -1,6 +1,7 @@
 package br.com.dev360.gemisnap.feature.snap.hub.presentation
 
 import android.net.Uri
+import br.com.dev360.gemisnap.core.networking.data.ResultWrapper
 import br.com.dev360.gemisnap.core.shared.coroutines.CoroutineTestRule
 import br.com.dev360.gemisnap.core.shared.test.coVerifyNever
 import br.com.dev360.gemisnap.core.shared.test.coVerifyOnce
@@ -9,6 +10,8 @@ import br.com.dev360.gemisnap.feature.snap.BASE64_IMAGE
 import br.com.dev360.gemisnap.feature.snap.ERROR_MESSAGE
 import br.com.dev360.gemisnap.feature.snap.GEMINI_RESPONSE_TEXT
 import br.com.dev360.gemisnap.feature.snap.PROMPT
+import br.com.dev360.gemisnap.feature.snap.failureError
+import br.com.dev360.gemisnap.feature.snap.geminiResultWrapperSuccess
 import br.com.dev360.gemisnap.feature.snap.hub.domain.HubSnapContract
 import io.mockk.coEvery
 import io.mockk.confirmVerified
@@ -22,6 +25,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HubSnapViewModelTest {
@@ -45,54 +49,64 @@ class HubSnapViewModelTest {
     }
 
     @Test
-    fun `analyzeImage should update state to success when everything works`() = runTest(coroutineTestRule.testDispatcher) {
-        every { uiModel.getDefaultPrompt(any()) } returns PROMPT
-        coEvery { uiModel.decodeAndConvertBase64(uri) } returns BASE64_IMAGE
-        coEvery { repository.generateContent(any(), BASE64_IMAGE) } returns GEMINI_RESPONSE_TEXT
+    fun `analyzeImage should update state to success when everything works`() =
+        runTest(coroutineTestRule.testDispatcher) {
+            every { uiModel.getDefaultPrompt(any()) } returns PROMPT
+            coEvery { uiModel.decodeAndConvertBase64(uri) } returns BASE64_IMAGE
+            coEvery {
+                repository.generateContent(
+                    any(),
+                    BASE64_IMAGE
+                )
+            } returns geminiResultWrapperSuccess
 
-        viewModel.onAction(HubSnapAction.ImageSelected(uri))
-        viewModel.onAction(HubSnapAction.PrimaryActionClicked)
-        advanceUntilIdle()
+            viewModel.onAction(HubSnapAction.ImageSelected(uri))
+            viewModel.onAction(HubSnapAction.PrimaryActionClicked)
+            advanceUntilIdle()
 
-        coVerifyOnce { repository.generateContent(any(), any()) }
+            coVerifyOnce { repository.generateContent(any(), any()) }
 
-        val state = viewModel.uiState.value
-        assertEquals(GEMINI_RESPONSE_TEXT, state.geminiText)
-        assertEquals(false, state.isError)
-        assertEquals(false, state.isLoading)
-    }
-
-    @Test
-    fun `analyzeImage should set isError when repository fails`() = runTest(coroutineTestRule.testDispatcher) {
-        every { uiModel.getDefaultPrompt(any()) } returns PROMPT
-        coEvery { uiModel.decodeAndConvertBase64(uri) } returns BASE64_IMAGE
-        coEvery { repository.generateContent(any(), any()) } throws Exception(ERROR_MESSAGE)
-
-        viewModel.onAction(HubSnapAction.ImageSelected(uri))
-        viewModel.onAction(HubSnapAction.PrimaryActionClicked)
-        advanceUntilIdle()
-
-        coVerifyOnce { repository.generateContent(any(), any()) }
-
-        val state = viewModel.uiState.value
-        assertEquals(true, state.isError)
-        assertEquals(false, state.isLoading)
-        assertEquals(null, state.geminiText)
-    }
+            val state = viewModel.uiState.value
+            assertEquals(GEMINI_RESPONSE_TEXT, state.geminiText)
+            assertTrue(state.errorMessage.isNullOrBlank())
+            assertEquals(false, state.isLoading)
+        }
 
     @Test
-    fun `analyzeImage should stop if image processing fails`() = runTest(coroutineTestRule.testDispatcher) {
-        every { uiModel.getDefaultPrompt(any()) } returns PROMPT
-        coEvery { uiModel.decodeAndConvertBase64(uri) } throws RuntimeException(ERROR_MESSAGE)
+    fun `analyzeImage should set isError when repository fails`() =
+        runTest(coroutineTestRule.testDispatcher) {
+            every { uiModel.getDefaultPrompt(any()) } returns PROMPT
+            coEvery { uiModel.decodeAndConvertBase64(uri) } returns BASE64_IMAGE
 
-        viewModel.onAction(HubSnapAction.ImageSelected(uri))
-        viewModel.onAction(HubSnapAction.PrimaryActionClicked)
-        advanceUntilIdle()
+            coEvery { repository.generateContent(any(), any()) } returns ResultWrapper.Error(failureError)
+            every { uiModel.getErrorMessage(failureError) } returns ERROR_MESSAGE
 
-        coVerifyNever { repository.generateContent(any(), any()) }
+            viewModel.onAction(HubSnapAction.ImageSelected(uri))
+            viewModel.onAction(HubSnapAction.PrimaryActionClicked)
+            advanceUntilIdle()
 
-        val state = viewModel.uiState.value
-        assertEquals(true, state.isError)
-        assertEquals(false, state.isLoading)
-    }
+            coVerifyOnce { repository.generateContent(PROMPT, BASE64_IMAGE) }
+
+            val state = viewModel.uiState.value
+            assertEquals(ERROR_MESSAGE, state.errorMessage)
+            assertEquals(false, state.isLoading)
+            assertEquals(null, state.geminiText)
+        }
+
+    @Test
+    fun `analyzeImage should stop if image processing fails`() =
+        runTest(coroutineTestRule.testDispatcher) {
+            every { uiModel.getDefaultPrompt(any()) } returns PROMPT
+            coEvery { uiModel.decodeAndConvertBase64(uri) } throws RuntimeException(ERROR_MESSAGE)
+
+            viewModel.onAction(HubSnapAction.ImageSelected(uri))
+            viewModel.onAction(HubSnapAction.PrimaryActionClicked)
+            advanceUntilIdle()
+
+            coVerifyNever { repository.generateContent(any(), any()) }
+
+            val state = viewModel.uiState.value
+            assertTrue(state.errorMessage.isNullOrBlank())
+            assertEquals(false, state.isLoading)
+        }
 }

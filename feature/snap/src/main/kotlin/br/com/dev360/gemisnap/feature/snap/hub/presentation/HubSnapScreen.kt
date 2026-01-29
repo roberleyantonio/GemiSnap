@@ -44,6 +44,22 @@ fun HubSnapScreen(
         }
     }
 
+    state.errorMessage?.let {
+        ScreenFeedback(
+            modifier = Modifier.padding(top = dimens.margin_16),
+            feedbackData = FeedbackDataModel(
+                feedbackType = FeedbackType.ERROR,
+                title = stringResource(R.string.gemini_error_title),
+                subtitle = it,
+                primaryButtonTitle = stringResource(R.string.gemini_primary_button_title),
+                secondaryButtonTitle = stringResource(R.string.gemini_secondary_button_title)
+            ),
+            onPrimaryButtonClick = { viewModel.onAction(HubSnapAction.PrimaryActionClicked) },
+            onSecondaryButtonClick = { viewModel.closeFeedbackError() }
+        )
+        return
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -67,20 +83,6 @@ fun HubSnapScreen(
                 viewModel.onAction(HubSnapAction.PrimaryActionClicked)
             },
             onPromptChange = { viewModel.onAction(HubSnapAction.PromptChanged(it)) }
-        )
-    }
-    if (state.isError) {
-        ScreenFeedback(
-            modifier = Modifier.padding(top = dimens.margin_16),
-            feedbackData = FeedbackDataModel(
-                feedbackType = FeedbackType.ERROR,
-                title = stringResource(R.string.gemini_error_title),
-                subtitle = stringResource(R.string.gemini_error_subtitle),
-                primaryButtonTitle = stringResource(R.string.gemini_primary_button_title),
-                secondaryButtonTitle = stringResource(R.string.gemini_secondary_button_title)
-            ),
-            onPrimaryButtonClick = { viewModel.onAction(HubSnapAction.PrimaryActionClicked) },
-            onSecondaryButtonClick = {}
         )
     }
 }

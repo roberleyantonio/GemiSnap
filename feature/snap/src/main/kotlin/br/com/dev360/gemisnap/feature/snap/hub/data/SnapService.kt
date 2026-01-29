@@ -1,5 +1,6 @@
 package br.com.dev360.gemisnap.feature.snap.hub.data
 
+import br.com.dev360.gemisnap.core.networking.factory.NetworkResponse
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.GeminiRequest
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.GeminiResponse
 import retrofit2.http.Body
@@ -11,7 +12,7 @@ interface SnapService {
     suspend fun generateContent(
         @Query(KEY_FIELD) apiKey: String,
         @Body request: GeminiRequest
-    ): GeminiResponse
+    ): NetworkResponse<GeminiResponse>
 
 
     private companion object {

@@ -1,5 +1,7 @@
 package br.com.dev360.gemisnap.feature.snap.hub.data
 
+import br.com.dev360.gemisnap.core.networking.data.ResultWrapper
+import br.com.dev360.gemisnap.core.networking.factory.toResult
 import br.com.dev360.gemisnap.feature.snap.BuildConfig
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.ContentRequest
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.GeminiRequest
@@ -11,7 +13,7 @@ import br.com.dev360.gemisnap.feature.snap.hub.domain.HubSnapContract
 class HubSnapRepositoryImpl(
     private val remoteDataSource: HubSnapContract.RemoteDataSource
 ) : HubSnapContract.Repository {
-    override suspend fun generateContent(prompt: String, base64Image: String): String? {
+    override suspend fun generateContent(prompt: String, base64Image: String): ResultWrapper<String?> {
         val request = GeminiRequest(
             contents = listOf(
                 ContentRequest(
@@ -31,7 +33,7 @@ class HubSnapRepositoryImpl(
         return remoteDataSource.generateContent(
             apiKey = BuildConfig.GEMINI_API_KEY,
             request = request
-        ).toText()
+        ).toResult().map { it.toText() }
     }
 
     private companion object {

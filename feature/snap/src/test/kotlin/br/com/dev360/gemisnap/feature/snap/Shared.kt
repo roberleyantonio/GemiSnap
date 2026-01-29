@@ -1,9 +1,13 @@
 package br.com.dev360.gemisnap.feature.snap
 
+import br.com.dev360.gemisnap.core.networking.exception.Failure
+import br.com.dev360.gemisnap.core.networking.factory.NetworkResponse
+import br.com.dev360.gemisnap.core.networking.factory.toResult
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.CandidateResponse
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.ContentResponse
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.GeminiResponse
 import br.com.dev360.gemisnap.feature.snap.hub.data.model.PartTextResponse
+import br.com.dev360.gemisnap.feature.snap.hub.data.model.toText
 
 const val PROMPT = "Analyze this image"
 const val BASE64_IMAGE = "base64-encoded-data"
@@ -24,3 +28,9 @@ val geminiResponse = GeminiResponse(
         )
     )
 )
+
+val geminiNetworkResponseSuccess = NetworkResponse.Success(geminiResponse)
+
+val geminiResultWrapperSuccess = geminiNetworkResponseSuccess.toResult().map { it.toText() }
+
+val failureError = Failure.GenericError(ERROR_MESSAGE)
