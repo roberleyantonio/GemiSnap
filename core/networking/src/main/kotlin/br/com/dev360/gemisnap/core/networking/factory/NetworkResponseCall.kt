@@ -11,6 +11,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 
+@Suppress("UNCHECKED_CAST")
 class NetworkResponseCall<T>(
     proxy: Call<T>
 ) : CallDelegate<T, NetworkResponse<T>>(proxy) {

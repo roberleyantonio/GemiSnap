@@ -38,4 +38,11 @@ dependencies {
     implementation(project(":core:shared"))
     implementation(project(":core:shared-ui"))
     implementation(project(":core:networking"))
+
+
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    androidTestImplementation(libs.koin.test)
+
+    androidTestImplementation(libs.test.mockk.android)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }

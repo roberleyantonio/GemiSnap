@@ -71,6 +71,7 @@ test-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 test-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "composeTest" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+test-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
