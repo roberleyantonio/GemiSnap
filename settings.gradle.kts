@@ -22,7 +22,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "GemiSnap"
 include(":app")
-include(":core:analytics")
 include(":core:networking")
 include(":core:shared")
 include(":core:shared-ui")

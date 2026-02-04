@@ -83,22 +83,23 @@ class HubSnapViewModel(
                 return@launch
             }
 
-            repository.generateContent(prompt, base64Image).withSuccessAndError({ geminiText ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        geminiText = geminiText,
-                        errorMessage = null
-                    )
-                }
-            }, { failure ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = uiModel.getErrorMessage(failure)
-                    )
-                }
-            })
+            repository.generateContent(prompt, base64Image)
+                .withSuccessAndError({ geminiText ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            geminiText = geminiText,
+                            errorMessage = null
+                        )
+                    }
+                }, { failure ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = uiModel.getErrorMessage(failure)
+                        )
+                    }
+                })
         }
     }
 

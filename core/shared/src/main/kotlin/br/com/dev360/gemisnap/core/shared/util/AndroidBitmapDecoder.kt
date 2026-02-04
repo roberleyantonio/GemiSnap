@@ -12,7 +12,7 @@ class AndroidBitmapDecoder(
 ) : BitmapDecoder {
     override fun decode(uri: Uri): Bitmap {
         val resolver = contentResolver
-        return if (Build.VERSION.SDK_INT >= 28) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val source = ImageDecoder.createSource(resolver, uri)
             ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
                 if (info.size.width > IMAGE_MAX_SIZE || info.size.height > IMAGE_MAX_SIZE) {
