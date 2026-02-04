@@ -38,7 +38,7 @@ The project is structured to ensure that business logic is completely separated 
 2. **Clone the repository**:
    `git clone https://github.com/your-username/gemisnap.git`
 3. **Configure the Key**: Add your API key to your project's configuration (e.g., `local.properties`):
-   `gemini.api.key=YOUR_API_KEY`
+   `GEMINI_API_KEY=YOUR_API_KEY`
 4. **Build**: Sync Gradle and run the app on an emulator (API 26+) or physical device.
 
 ## 🧪 Testing
