@@ -11,6 +11,11 @@
 
 <img width="200" height="726" alt="Captura de Tela 2026-02-11 às 13 41 11" src="https://github.com/user-attachments/assets/2277c597-4d2d-40e6-a37c-3a3e22767638" /> <img width="200" height="725" alt="Captura de Tela 2026-02-11 às 13 41 25" src="https://github.com/user-attachments/assets/950372ec-bf16-40ad-b163-9e8f22a86557" /> <img width="200" height="723" alt="Captura de Tela 2026-02-11 às 13 41 37" src="https://github.com/user-attachments/assets/043a0233-b309-421e-ae2e-cab66dbfeea0" />
 
+
+
+https://github.com/user-attachments/assets/90dd854a-d6f0-4b44-b4b7-1cfece393c20
+
+
 ---
 
 ## 🛠 Features
