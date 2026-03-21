@@ -11,7 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
@@ -25,19 +29,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun HubSnapContent(
     imageUri: Uri?,
-    prompt: String,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
     geminiText: String? = null,
     onImageClick: () -> Unit,
-    onPromptButtonClick: () -> Unit,
-    onPromptChange: (String) -> Unit,
+    onAnalyzeClick: (String) -> Unit,
+    onClearClick: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboard.current
     val context = LocalContext.current
     val textCopied = stringResource(R.string.text_copied)
+    var localPrompt by rememberSaveable { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -55,17 +59,24 @@ fun HubSnapContent(
         Spacer(modifier = Modifier.height(dimens.margin_16))
 
         PromptField(
-            prompt = prompt,
+            prompt = localPrompt,
             enabled = isLoading.not(),
             visible =  imageUri != null,
-            onValueChange = { onPromptChange(it) }
+            onValueChange = { localPrompt = it}
         )
 
         PromptButton(
             titleRes = if (geminiText.isNullOrBlank()) R.string.get_from_gemini else R.string.start_again,
             enabled = imageUri != null && isLoading.not(),
             isLoading = isLoading,
-            onClick = onPromptButtonClick
+            onClick = {
+                if (geminiText.isNullOrBlank()) {
+                    onAnalyzeClick(localPrompt)
+                } else {
+                    localPrompt = ""
+                    onClearClick()
+                }
+            }
         )
         Spacer(modifier = Modifier.height(dimens.margin_24))
 

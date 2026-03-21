@@ -1,25 +1,24 @@
 package br.com.dev360.gemisnap.feature.snap.hub.presentation
 
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import br.com.dev360.gemisnap.feature.snap.ERROR_MESSAGE
 import br.com.dev360.gemisnap.feature.snap.R
+import br.com.dev360.gemisnap.feature.snap.TEST_INPUT_PROMPT
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class HubSnapScreenTest {
@@ -32,21 +31,11 @@ class HubSnapScreenTest {
 
     @Before
     fun setup() {
-        startKoin {
-            modules(module {
-                single { viewModel }
-            })
-        }
         every { viewModel.uiState } returns uiState
     }
 
-    @After
-    fun tearDown() {
-        stopKoin()
-    }
-
     @Test
-    fun shouldDisplayScreenTitle() {
+    fun shouldDisplayScreenTitle_whenThereIsNoError() {
         val titleText = composeTestRule.activity.getString(R.string.hub_snap_screen_title)
 
         composeTestRule.setContent {
@@ -81,7 +70,7 @@ class HubSnapScreenTest {
         val retryBtnText = composeTestRule.activity.getString(R.string.gemini_primary_button_title)
         composeTestRule.onNodeWithText(retryBtnText).performClick()
 
-        verify { viewModel.onAction(HubSnapAction.PrimaryActionClicked) }
+        verify { viewModel.onAction(HubSnapAction.RetryRequested) }
     }
 
     @Test
@@ -98,4 +87,29 @@ class HubSnapScreenTest {
         verify { viewModel.closeFeedbackError() }
     }
 
+    @Test
+    fun whenImageIsSelected_andUserTypesPrompt_andClicksAnalyze_shouldPassTextToViewModel() {
+        uiState.value = HubSnapState(
+            selectedImageUri = mockk<Uri>(relaxed = true),
+            isLoading = false,
+            geminiText = null
+        )
+
+        composeTestRule.setContent {
+            HubSnapScreen(viewModel = viewModel)
+        }
+
+        val promptLabel = composeTestRule.activity.getString(R.string.prompt_label)
+        val analyzeBtnText = composeTestRule.activity.getString(R.string.get_from_gemini)
+
+        composeTestRule.onNodeWithText(promptLabel).performTextInput(TEST_INPUT_PROMPT)
+
+        composeTestRule.onNodeWithText(analyzeBtnText).performClick()
+
+        verify {
+            viewModel.onAction(
+                HubSnapAction.PrimaryActionClicked(prompt = TEST_INPUT_PROMPT)
+            )
+        }
+    }
 }

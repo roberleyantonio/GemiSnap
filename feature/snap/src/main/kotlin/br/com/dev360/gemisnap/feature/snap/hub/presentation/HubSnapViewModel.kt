@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.dev360.gemisnap.core.shared.coroutines.CustomDispatchers
-import br.com.dev360.gemisnap.core.shared.extensions.empty
 import br.com.dev360.gemisnap.feature.snap.hub.domain.HubSnapContract
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,14 +14,14 @@ import kotlinx.coroutines.withContext
 
 sealed interface HubSnapAction {
     data class ImageSelected(val uri: Uri) : HubSnapAction
-    data class PromptChanged(val value: String) : HubSnapAction
-    data object PrimaryActionClicked : HubSnapAction
+    data class PrimaryActionClicked(val prompt: String) : HubSnapAction
+    data object RetryRequested : HubSnapAction
     data object ClearRequested : HubSnapAction
 }
 
 data class HubSnapState(
-    val prompt: String = String.empty(),
     val geminiText: String? = null,
+    val selectedImageUri: Uri? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
@@ -32,40 +31,38 @@ class HubSnapViewModel(
     private val uiModel: HubSnapContract.UiModel,
     private val dispatchers: CustomDispatchers
 ) : ViewModel() {
+    private var lastPrompt: String = ""
+
     private val _uiState = MutableStateFlow(HubSnapState())
     val uiState = _uiState.asStateFlow()
 
     private var analysisJob: Job? = null
-    private var selectedImageUri: Uri? = null
 
     fun onAction(action: HubSnapAction) {
         when (action) {
             is HubSnapAction.ImageSelected -> {
                 clearResult()
-                selectedImageUri = action.uri
+                _uiState.update {
+                    it.copy(
+                        selectedImageUri = action.uri,
+                    )
+                }
             }
-
-            is HubSnapAction.PromptChanged -> {
-                _uiState.update { it.copy(prompt = action.value) }
-            }
-
-            HubSnapAction.PrimaryActionClicked -> {
+            is HubSnapAction.PrimaryActionClicked -> {
                 if (_uiState.value.geminiText.isNullOrBlank()) {
+                    lastPrompt = action.prompt
                     analyzeImage()
                 } else {
                     clearAll()
                 }
             }
-
-            HubSnapAction.ClearRequested -> {
-                clearAll()
-            }
+            HubSnapAction.RetryRequested -> analyzeImage()
+            HubSnapAction.ClearRequested -> clearAll()
         }
     }
 
     fun analyzeImage() {
-        val uri = selectedImageUri ?: return
-        val prompt = uiModel.getDefaultPrompt(_uiState.value.prompt)
+        val uri = _uiState.value.selectedImageUri ?: return
 
         analysisJob?.cancel()
 
@@ -83,7 +80,7 @@ class HubSnapViewModel(
                 return@launch
             }
 
-            repository.generateContent(prompt, base64Image)
+            repository.generateContent(lastPrompt, base64Image)
                 .withSuccessAndError({ geminiText ->
                     _uiState.update {
                         it.copy(
@@ -119,7 +116,7 @@ class HubSnapViewModel(
 
     private fun clearAll() {
         analysisJob?.cancel()
-        selectedImageUri = null
+        lastPrompt = ""
         _uiState.value = HubSnapState()
     }
 }
