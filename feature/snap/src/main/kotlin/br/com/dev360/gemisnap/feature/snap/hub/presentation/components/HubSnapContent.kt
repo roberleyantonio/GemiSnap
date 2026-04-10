@@ -51,7 +51,7 @@ fun HubSnapContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ImageCard(
-            imageUri = imageUri,
+            model = imageUri,
             isLoading = isLoading,
             onClick = { onImageClick() }
         )
