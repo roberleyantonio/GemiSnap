@@ -1,6 +1,5 @@
 package br.com.dev360.gemisnap.feature.snap.hub.presentation.components
 
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +22,7 @@ import coil.request.ImageRequest
 
 @Composable
 fun ImageCard(
-    imageUri: Uri?,
+    model: Any?,
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     onClick: () -> Unit
@@ -37,10 +36,10 @@ fun ImageCard(
         elevation = CardDefaults.cardElevation(defaultElevation = dimens.margin_4)
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            if (imageUri != null) {
+            if (model != null) {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(imageUri)
+                        .data(model)
                         .crossfade(true)
                         .build(),
                     contentDescription = stringResource(R.string.image_content_description),

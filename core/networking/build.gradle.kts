@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -21,6 +22,10 @@ android {
         buildConfig = true
     }
 
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 dependencies {

@@ -34,7 +34,6 @@ fun ScanningAnimation(modifier: Modifier = Modifier) {
         val strokeWidth = 4.dp.toPx()
         val yOffset = size.height * translateY
 
-        // Efeito de gradiente atrás da linha
         drawRect(
             brush = Brush.verticalGradient(
                 colors = listOf(Color.Transparent, Color.Cyan.copy(alpha = 0.3f), Color.Transparent),

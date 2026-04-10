@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.secrets)
+    alias(libs.plugins.paparazzi)
 }
 
 android {
@@ -30,6 +32,18 @@ android {
     }
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
+tasks.withType<Test>().configureEach {
+    javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    )
+}
+
 dependencies {
     implementation(libs.androidx.activity.compose)
 
@@ -45,4 +59,6 @@ dependencies {
 
     androidTestImplementation(libs.test.mockk.android)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
+    testImplementation(libs.paparazzi)
 }
